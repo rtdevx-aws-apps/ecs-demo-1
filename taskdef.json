@@ -1,0 +1,19 @@
+{
+  "family": "ecs-nginx-app1-cicd",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::390157243794:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::390157243794:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "nginx",
+      "image": "390157243794.dkr.ecr.eu-central-1.amazonaws.com/aws-ecr-nginx",
+      "portMappings": [
+        { "containerPort": 80, "protocol": "tcp" }
+      ],
+      "essential": true
+    }
+  ]
+}

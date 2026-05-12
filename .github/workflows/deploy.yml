@@ -1,0 +1,113 @@
+name: CI-CD ECS Fargate - Demo 1
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: eu-central-1
+  AWS_ACCOUNT_ID: 390157243794
+  AWS_OIDC_ROLE: iac-aws-oidcRole-app-ecs-demo-1
+  ECR_REPO: aws-ecr-nginx
+  TASK_FAMILY: ecs-nginx-app1-cicd
+
+jobs:
+  build:
+    name: Build & Push Image
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image
+        run: |
+          docker build -t $ECR_REPO:${{ github.sha }} .
+
+      - name: Push image
+        run: |
+          docker tag $ECR_REPO:${{ github.sha }} $ECR_REPO:${{ github.sha }}
+          docker push $ECR_REPO:${{ github.sha }}
+
+      - name: Render task definition
+        run: |
+          sed "s|IMAGE_URI|$ECR_REPO:${{ github.sha }}|" taskdef.json > taskdef-rendered.json
+
+      - name: Upload taskdef artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: taskdef
+          path: taskdef-rendered.json
+
+  deploy-stag:
+    name: Deploy to STAG
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download taskdef
+        uses: actions/download-artifact@v4
+        with:
+          name: taskdef
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: taskdef-rendered.json
+          service: ecs-nginx-app1-cicd-svc-stag
+          cluster: ecs-fargate-cluster
+          wait-for-service-stability: true
+
+  deploy-prod:
+    name: Deploy to PROD
+    needs: deploy-stag
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://your-prod-url.com
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download taskdef
+        uses: actions/download-artifact@v4
+        with:
+          name: taskdef
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: taskdef-rendered.json
+          service: ecs-nginx-app1-cicd-svc-prod
+          cluster: ecs-fargate-cluster
+          wait-for-service-stability: true
