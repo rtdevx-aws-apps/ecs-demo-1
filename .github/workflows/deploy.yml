@@ -11,7 +11,7 @@ env:
   AWS_REGION: eu-central-1
   AWS_ACCOUNT_ID: 390157243794
   AWS_OIDC_ROLE: iac-aws-oidcRole-app-ecs-demo-1
-  ECR_REPO: aws-ecr-nginx
+  ECR_REPO: 390157243794.dkr.ecr.eu-central-1.amazonaws.com/aws-ecr-nginx
   TASK_FAMILY: ecs-nginx-app1-cicd
 
 jobs:
