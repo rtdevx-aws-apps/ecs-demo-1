@@ -58,6 +58,35 @@ jobs:
           path: taskdef-rendered.json
 
 # INFO: Deploy - STAG
+
+  deploy-stag:
+    name: Deploy to STAG
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download taskdef
+        uses: actions/download-artifact@v8
+        with:
+          name: taskdef
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: taskdef-rendered.json
+          service: ecs-nginx-app1-cicd-svc-stag
+          cluster: ecs-fargate
+          wait-for-service-stability: true
           
 # INFO: Deploy - PROD
 
