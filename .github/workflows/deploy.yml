@@ -118,5 +118,5 @@ jobs:
         with:
           task-definition: taskdef-rendered.json
           service: ecs-nginx-app1-cicd-svc-prod
-          cluster: ecs-fargate-cluster
+          cluster: ecs-fargate
           wait-for-service-stability: true
