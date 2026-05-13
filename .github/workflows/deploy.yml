@@ -92,7 +92,7 @@ jobs:
 
   deploy-prod:
     name: Deploy to PROD
-    needs: build
+    needs: deploy-stag
     runs-on: ubuntu-latest
 
     permissions:
