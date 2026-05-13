@@ -9,7 +9,7 @@
   "containerDefinitions": [
     {
       "name": "nginx",
-      "image": "390157243794.dkr.ecr.eu-central-1.amazonaws.com/aws-ecr-nginx:${{ github.sha }}",
+      "image": "390157243794.dkr.ecr.eu-central-1.amazonaws.com/aws-ecr-nginx",
       "portMappings": [
         { "containerPort": 80, "protocol": "tcp" }
       ],
