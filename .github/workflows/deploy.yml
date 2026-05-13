@@ -1,3 +1,6 @@
+# INFO: GitHub Actions deployment to ECS Fargate cluster
+# ? https://docs.github.com/en/actions/how-tos/deploy/deploy-to-third-party-platforms/amazon-elastic-container-service
+
 name: CI-CD ECS Fargate - Demo 1
 
 on:
@@ -51,63 +54,3 @@ jobs:
         with:
           name: taskdef
           path: taskdef-rendered.json
-
-  deploy-stag:
-    name: Deploy to STAG
-    needs: build
-    runs-on: ubuntu-latest
-
-    permissions:
-      id-token: write
-      contents: read
-
-    steps:
-      - name: Download taskdef
-        uses: actions/download-artifact@v4
-        with:
-          name: taskdef
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with:
-          task-definition: taskdef-rendered.json
-          service: ecs-nginx-app1-cicd-svc-stag
-          cluster: ecs-fargate-cluster
-          wait-for-service-stability: true
-
-  deploy-prod:
-    name: Deploy to PROD
-    needs: deploy-stag
-    runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: https://your-prod-url.com
-    permissions:
-      id-token: write
-      contents: read
-
-    steps:
-      - name: Download taskdef
-        uses: actions/download-artifact@v4
-        with:
-          name: taskdef
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with:
-          task-definition: taskdef-rendered.json
-          service: ecs-nginx-app1-cicd-svc-prod
-          cluster: ecs-fargate-cluster
-          wait-for-service-stability: true
