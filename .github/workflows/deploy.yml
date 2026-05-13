@@ -87,4 +87,3 @@ jobs:
           service: ecs-nginx-app1-cicd-svc-stag
           cluster: ecs-fargate
           wait-for-service-stability: true
-          
