@@ -88,3 +88,35 @@ jobs:
           cluster: ecs-fargate
           wait-for-service-stability: true
           
+# INFO: Deploy - PROD
+
+  deploy-prod:
+    name: Deploy to PROD
+    needs: deploy-stag
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://your-prod-url.com
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download taskdef
+        uses: actions/download-artifact@v8
+        with:
+          name: taskdef
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: taskdef-rendered.json
+          service: ecs-nginx-app1-cicd-svc-prod
+          cluster: ecs-fargate-cluster
+          wait-for-service-stability: true
