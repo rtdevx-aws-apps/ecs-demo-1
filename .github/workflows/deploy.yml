@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
@@ -50,7 +50,7 @@ jobs:
           sed "s|IMAGE_URI|$ECR_REPO:${{ github.sha }}|" taskdef.json > taskdef-rendered.json
 
       - name: Upload taskdef artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: taskdef
           path: taskdef-rendered.json
