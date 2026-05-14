@@ -171,6 +171,7 @@ jobs:
               aws ecs deregister-task-definition --task-definition "$ARN"
             fi
           done
+
           
 # INFO: Cleanup old ECR images
 
