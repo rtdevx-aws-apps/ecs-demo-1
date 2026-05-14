@@ -136,7 +136,7 @@ jobs:
 
   cleanup-task-defs:
     name: Cleanup old Task Definitions
-#    needs: deploy-prod
+    needs: deploy-prod
     runs-on: ubuntu-latest
 
     permissions:
@@ -177,7 +177,8 @@ jobs:
           echo "Waiting for ECS to mark deregistered revisions as INACTIVE..."
           sleep 5
 
-          echo "Fetching INACTIVE task definitions..."
+          echo "Fetching INACTIVE task definitions (last 10 - 'taskDefinitionArns[:10]')..."
+          echo "API limit for deletion is 10 tasks, we are deleting them gradually..."          
           INACTIVE_ARNS=$(aws ecs list-task-definitions \
             --family-prefix $FAMILY \
             --status INACTIVE \
