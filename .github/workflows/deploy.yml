@@ -126,5 +126,3 @@ jobs:
           service: ecs-nginx-app1-cicd-svc-prod
           cluster: ecs-fargate
           wait-for-service-stability: true
-          
-# 31
