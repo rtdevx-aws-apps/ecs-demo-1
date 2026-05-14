@@ -131,7 +131,7 @@ jobs:
 
   cleanup-ecr:
     name: Cleanup old ECR images
-    needs: deploy-prod
+#    needs: deploy-prod
     runs-on: ubuntu-latest
 
     permissions:
@@ -169,4 +169,3 @@ jobs:
                 --image-ids imageDigest="$DIGEST"
             fi
           done
-          
