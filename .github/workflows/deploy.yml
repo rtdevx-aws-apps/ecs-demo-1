@@ -174,14 +174,24 @@ jobs:
             fi
           done
 
-          # Delete all deregistered (INACTIVE) revisions
-          if [ ${#TO_DELETE[@]} -gt 0 ]; then
-            echo "Deleting INACTIVE task definitions..."
-            aws ecs delete-task-definitions \
-              --task-definitions "${TO_DELETE[@]}"
-          else
-            echo "Nothing to delete"
+          echo "Waiting for ECS to mark deregistered revisions as INACTIVE..."
+          sleep 5
+
+          echo "Fetching INACTIVE task definitions..."
+          INACTIVE_ARNS=$(aws ecs list-task-definitions \
+            --family-prefix $FAMILY \
+            --status INACTIVE \
+            --sort ASC \
+            --query 'taskDefinitionArns' \
+            --output text)
+
+          if [ -z "$INACTIVE_ARNS" ]; then
+            echo "No INACTIVE task definitions found to delete"
+            exit 0
           fi
+
+          echo "Deleting INACTIVE task definitions..."
+          aws ecs delete-task-definitions --task-definitions $INACTIVE_ARNS
           
 # INFO: Cleanup old ECR images
 
