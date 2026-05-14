@@ -65,9 +65,9 @@ jobs:
     name: Deploy to STAG
     needs: build
     runs-on: ubuntu-latest
-#    environment:
-#      name: stag
-#      url: https://your-stag-url.com      
+    environment:
+      name: stag
+      url: https://your-stag-url.com      
 
     permissions:
       id-token: write
