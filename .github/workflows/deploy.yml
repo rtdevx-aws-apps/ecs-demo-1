@@ -10,6 +10,7 @@ on:
 env:
   AWS_REGION: eu-central-1
   AWS_ACCOUNT_ID: 390157243794
+  AWS_OIDC_ROLE: iac-aws-oidcRole-app-ecs-demo-1  
   AWS_OIDC_ROLE_PROD: iac-aws-oidcRole-app-ecs-demo-1-prod
   AWS_OIDC_ROLE_STAG: iac-aws-oidcRole-app-ecs-demo-1-stag
   ECR_REPO: 390157243794.dkr.ecr.eu-central-1.amazonaws.com/aws-ecr-nginx
@@ -33,7 +34,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE_STAG }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to ECR
@@ -81,7 +82,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE_PROD }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE_STAG }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy to ECS
@@ -115,7 +116,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE_PROD }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy to ECS
