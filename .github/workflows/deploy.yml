@@ -172,6 +172,7 @@ jobs:
             fi
           done
 
+          
 # INFO: Cleanup old ECR images
 
 #  cleanup-ecr:
