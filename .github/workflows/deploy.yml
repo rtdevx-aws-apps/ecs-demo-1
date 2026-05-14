@@ -135,6 +135,7 @@ jobs:
 # - AWS treats task definitions as immutable artifacts
 
   cleanup-task-defs:
+    name: Cleanup old Task Definitions
     needs: deploy-prod
     runs-on: ubuntu-latest
 
