@@ -182,7 +182,7 @@ jobs:
             --family-prefix $FAMILY \
             --status INACTIVE \
             --sort ASC \
-            --query 'taskDefinitionArns' \
+            --query 'taskDefinitionArns[:10]' \
             --output text)
 
           if [ -z "$INACTIVE_ARNS" ]; then
