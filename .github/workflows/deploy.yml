@@ -10,7 +10,8 @@ on:
 env:
   AWS_REGION: eu-central-1
   AWS_ACCOUNT_ID: 390157243794
-  AWS_OIDC_ROLE: iac-aws-oidcRole-app-ecs-demo-1  
+  # OIDC Roles defined here: https://github.com/rtdevx/iac-terraform-core/blob/main/aws-oidc/c6-iam-app-ecs-demo-1.tf  
+  AWS_OIDC_ROLE: iac-aws-oidcRole-app-ecs-demo-1
   AWS_OIDC_ROLE_PROD: iac-aws-oidcRole-app-ecs-demo-1-prod
   AWS_OIDC_ROLE_STAG: iac-aws-oidcRole-app-ecs-demo-1-stag
   ECR_REPO: 390157243794.dkr.ecr.eu-central-1.amazonaws.com/aws-ecr-nginx
@@ -44,12 +45,12 @@ jobs:
         run: |
           docker build -t $ECR_REPO:${{ github.sha }} .
 
-      - name: Push image
+      - name: Tag and Push image
         run: |
           docker tag $ECR_REPO:${{ github.sha }} $ECR_REPO:${{ github.sha }}
           docker push $ECR_REPO:${{ github.sha }}
 
-      - name: Render task definition
+      - name: Render task definition (update JSON Task Definition with the lastest SHA)
         run: |
           sed "s|$ECR_REPO|$ECR_REPO:${{ github.sha }}|" taskdef.json > taskdef-rendered.json
 
@@ -128,7 +129,7 @@ jobs:
           wait-for-service-stability: true
 
 # INFO: Cleanup old Task Definitions
-#ECS does not auto‑expire or auto‑delete task definition revisions.
+# ECS does not auto‑expire or auto‑delete task definition revisions.
 # - You may want to roll back instantly
 # - ECS needs historical metadata
 # - Some revisions may still be used by running tasks
