@@ -136,7 +136,7 @@ jobs:
 
   cleanup-task-defs:
     name: Cleanup old Task Definitions
-#    needs: deploy-prod
+    needs: deploy-prod
     runs-on: ubuntu-latest
 
     permissions:
