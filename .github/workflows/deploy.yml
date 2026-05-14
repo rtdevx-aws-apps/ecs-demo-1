@@ -139,6 +139,10 @@ jobs:
 #    needs: deploy-prod
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
