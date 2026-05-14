@@ -136,7 +136,7 @@ jobs:
 
   cleanup-task-defs:
     name: Cleanup old Task Definitions
-    needs: deploy-prod
+#    needs: deploy-prod
     runs-on: ubuntu-latest
 
     permissions:
@@ -177,7 +177,8 @@ jobs:
           # Delete all deregistered (INACTIVE) revisions
           if [ ${#TO_DELETE[@]} -gt 0 ]; then
             echo "Deleting INACTIVE task definitions..."
-            aws ecs delete-task-definitions --task-definitions "${TO_DELETE[@]}"
+            aws ecs delete-task-definitions \
+              --task-definitions "${TO_DELETE[@]}"
           else
             echo "Nothing to delete"
           fi
