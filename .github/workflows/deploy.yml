@@ -65,9 +65,9 @@ jobs:
     name: Deploy to STAG
     needs: build
     runs-on: ubuntu-latest
-    environment:
-      name: stag
-      url: https://your-stag-url.com      
+#    environment:
+#      name: stag
+#      url: https://your-stag-url.com      
 
     permissions:
       id-token: write
@@ -82,7 +82,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE_STAG }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy to ECS
@@ -126,4 +126,3 @@ jobs:
           service: ecs-nginx-app1-cicd-svc-prod
           cluster: ecs-fargate
           wait-for-service-stability: true
-          
