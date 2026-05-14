@@ -127,6 +127,46 @@ jobs:
           cluster: ecs-fargate
           wait-for-service-stability: true
 
+# INFO: Cleanup old Task Definitions
+#ECS does not auto‑expire or auto‑delete task definition revisions.
+# - You may want to roll back instantly
+# - ECS needs historical metadata
+# - Some revisions may still be used by running tasks
+# - AWS treats task definitions as immutable artifacts
+
+  cleanup-task-defs:
+    needs: deploy-prod
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_OIDC_ROLE_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Cleanup old task definitions
+        run: |
+          FAMILY="${TASK_FAMILY}"
+          KEEP=10
+
+          ARNS=$(aws ecs list-task-definitions \
+            --family-prefix $FAMILY \
+            --sort ASC \
+            --query 'taskDefinitionArns' \
+            --output text)
+
+          COUNT=0
+          for ARN in $ARNS; do
+            COUNT=$((COUNT+1))
+            if [ $COUNT -le $KEEP ]; then
+              echo "Keeping $ARN"
+            else
+              echo "Deregistering $ARN"
+              aws ecs deregister-task-definition --task-definition "$ARN"
+            fi
+          done
+
 # INFO: Cleanup old ECR images
 
 #  cleanup-ecr:
