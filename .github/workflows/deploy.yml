@@ -192,6 +192,7 @@ jobs:
 
           echo "Deleting INACTIVE task definitions..."
           aws ecs delete-task-definitions --task-definitions $INACTIVE_ARNS
+
           
 # INFO: Cleanup old ECR images
 
