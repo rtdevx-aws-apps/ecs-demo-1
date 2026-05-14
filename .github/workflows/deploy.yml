@@ -127,4 +127,4 @@ jobs:
           cluster: ecs-fargate
           wait-for-service-stability: true
           
-# 24
+# 25
