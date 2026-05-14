@@ -155,12 +155,14 @@ jobs:
           FAMILY="${TASK_FAMILY}"
           KEEP=10
 
+          # Get all revisions sorted oldest -> newest
           ARNS=$(aws ecs list-task-definitions \
             --family-prefix $FAMILY \
             --sort ASC \
             --query 'taskDefinitionArns' \
             --output text)
 
+          # Deregister revisions and keep only "KEEP="
           COUNT=0
           for ARN in $ARNS; do
             COUNT=$((COUNT+1))
@@ -172,6 +174,13 @@ jobs:
             fi
           done
 
+          # Delete all deregistered (INACTIVE) revisions
+          if [ ${#TO_DELETE[@]} -gt 0 ]; then
+            echo "Deleting INACTIVE task definitions..."
+            aws ecs delete-task-definitions --task-definitions "${TO_DELETE[@]}"
+          else
+            echo "Nothing to delete"
+          fi
           
 # INFO: Cleanup old ECR images
 
